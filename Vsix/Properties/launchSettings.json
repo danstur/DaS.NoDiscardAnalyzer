@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "Analyzers.Vsix": {
+      "commandName": "Project",
+      "nativeDebugging": true
+    }
+  }
+}

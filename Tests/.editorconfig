@@ -1,0 +1,13 @@
+[*.cs]
+
+### Diagnostics Configuration
+
+## StyleCop Changes
+
+# CA1707: Identifiers should not contain underscores
+# Acceptable for tests
+dotnet_diagnostic.CA1707.severity = none
+
+# CA2007: Consider calling ConfigureAwait on the awaited task
+# Important for the actual analyzer, but not in tests.
+dotnet_diagnostic.CA2007.severity = none

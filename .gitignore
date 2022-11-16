@@ -1,0 +1,11 @@
+# IDEs
+.rider/
+.vs/
+.vscode/
+
+# compile output
+bin/
+obj/
+
+# R# configuration files
+*.DotSettings.user

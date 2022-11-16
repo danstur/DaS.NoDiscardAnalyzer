@@ -1,0 +1,64 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NoDiscardAnalyzer", "Analyzer\NoDiscardAnalyzer.csproj", "{795303B5-49A6-42DF-BEF9-F604401C2BCC}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{2C36B4C6-E756-4679-94C9-CDAE748EBD83}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+		.gitignore = .gitignore
+		.globalconfig = .globalconfig
+		Directory.Build.props = Directory.Build.props
+		global.json = global.json
+	EndProjectSection
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NoDiscardAnalyzer.Attributes", "Attributes\NoDiscardAnalyzer.Attributes.csproj", "{6EA2A524-0458-46CF-9A47-C958FDAEF962}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NoDiscardAnalyzer.Package", "Package\NoDiscardAnalyzer.Package.csproj", "{32DD36E0-E05B-457A-8CB6-DFB2DA66CB86}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NoDiscardAnalyzer.Vsix", "Vsix\NoDiscardAnalyzer.Vsix.csproj", "{8FB70640-9758-4DCA-92E1-4B0F3CCC162D}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NoDiscardAnalyzer.CodeFixes", "CodeFixes\NoDiscardAnalyzer.CodeFixes.csproj", "{4C454BDE-DEA8-45B2-92DF-F43AFE4BD48E}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NoDiscardAnalyzer.Tests", "Tests\NoDiscardAnalyzer.Tests.csproj", "{578CCDB9-A080-4EE0-BA56-5FE03F15452A}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{795303B5-49A6-42DF-BEF9-F604401C2BCC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{795303B5-49A6-42DF-BEF9-F604401C2BCC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{795303B5-49A6-42DF-BEF9-F604401C2BCC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{795303B5-49A6-42DF-BEF9-F604401C2BCC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6EA2A524-0458-46CF-9A47-C958FDAEF962}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6EA2A524-0458-46CF-9A47-C958FDAEF962}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6EA2A524-0458-46CF-9A47-C958FDAEF962}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6EA2A524-0458-46CF-9A47-C958FDAEF962}.Release|Any CPU.Build.0 = Release|Any CPU
+		{32DD36E0-E05B-457A-8CB6-DFB2DA66CB86}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{32DD36E0-E05B-457A-8CB6-DFB2DA66CB86}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{32DD36E0-E05B-457A-8CB6-DFB2DA66CB86}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{32DD36E0-E05B-457A-8CB6-DFB2DA66CB86}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8FB70640-9758-4DCA-92E1-4B0F3CCC162D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8FB70640-9758-4DCA-92E1-4B0F3CCC162D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8FB70640-9758-4DCA-92E1-4B0F3CCC162D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8FB70640-9758-4DCA-92E1-4B0F3CCC162D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4C454BDE-DEA8-45B2-92DF-F43AFE4BD48E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4C454BDE-DEA8-45B2-92DF-F43AFE4BD48E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4C454BDE-DEA8-45B2-92DF-F43AFE4BD48E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4C454BDE-DEA8-45B2-92DF-F43AFE4BD48E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{578CCDB9-A080-4EE0-BA56-5FE03F15452A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{578CCDB9-A080-4EE0-BA56-5FE03F15452A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{578CCDB9-A080-4EE0-BA56-5FE03F15452A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{578CCDB9-A080-4EE0-BA56-5FE03F15452A}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {5BED6F56-D770-4F2D-B3AD-128969F3CB28}
+	EndGlobalSection
+EndGlobal

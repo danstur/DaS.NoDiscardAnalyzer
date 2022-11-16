@@ -1,0 +1,34 @@
+<Project>
+  <PropertyGroup>
+    <VersionPrefix>0.1.0</VersionPrefix>
+    <RootNamespace>DaS.$(MSBuildProjectName)</RootNamespace>
+    <AssemblyName>$(RootNamespace)</AssemblyName>
+
+    <ToolTargetFramework>netstandard2.0</ToolTargetFramework>
+    <NetCoreTargetFramework>net7.0</NetCoreTargetFramework>
+    <NetFxTargetFramework>net48</NetFxTargetFramework>
+    
+    <!-- The CodeAnalysis nugets must be low enough to support the minimum Visual Studio version that we want to support.
+    See https://github.com/dotnet/roslyn/blob/main/docs/wiki/NuGet-packages.md for the mapping of nuget to VS version.
+    Note that using the analyzers in Visual Studio requires a new enough version, otherwise VS cannot load the analyzers.
+    We therefore use the latest version by default but allow overriding for CLI builds.-->
+    <MsCodeAnalysisVersion Condition=" '$(MsCodeAnalysisVersion)' == '' ">4.4.0</MsCodeAnalysisVersion>
+
+    <IsPackable>false</IsPackable>
+    <LangVersion>11.0</LangVersion>
+    <Nullable>enable</Nullable>
+    <EnableNETAnalyzers>true</EnableNETAnalyzers>
+    <AnalysisMode>AllEnabledByDefault</AnalysisMode>
+    <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+    <WarningLevel>4</WarningLevel>
+    <AnalysisLevel>7</AnalysisLevel>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <!--
+      1591: Do not warn about missing public comments.
+      CA1014: Mark assemblies as CLSCompliant => cannot be configured via editorconfig.
+    -->
+    <NoWarn>$(NoWarn);1591;CA1014</NoWarn>
+    <NeutralLanguage>en</NeutralLanguage>
+    <ManagePackageVersionsCentrally>false</ManagePackageVersionsCentrally>
+  </PropertyGroup>
+</Project>
