@@ -8,6 +8,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Content Include="xunit.runner.json" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
+  <ItemGroup>
     <!-- Support for newer compiler features in old full frameworks -->
     <PackageReference Include="IsExternalInit" Version="1.0.3">
       <PrivateAssets>all</PrivateAssets>
@@ -43,5 +47,4 @@
     <ProjectReference Include="..\Attributes\NoDiscardAnalyzer.Attributes.csproj" />
     <ProjectReference Include="..\CodeFixes\NoDiscardAnalyzer.CodeFixes.csproj" />
   </ItemGroup>
-
 </Project>
