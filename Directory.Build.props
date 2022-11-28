@@ -30,5 +30,22 @@
     <NoWarn>$(NoWarn);1591;CA1014</NoWarn>
     <NeutralLanguage>en</NeutralLanguage>
     <ManagePackageVersionsCentrally>false</ManagePackageVersionsCentrally>
+    <RestoreUseStaticGraphEvaluation>true</RestoreUseStaticGraphEvaluation>
   </PropertyGroup>
+
+  <PropertyGroup>
+    <Authors>Daniel Sturm</Authors>
+    <PackageProjectUrl>https://github.com/danstur/DaS.NoDiscardAnalyzer</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/danstur/DaS.NoDiscardAnalyzer.git</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageLicenseFile>LICENSE</PackageLicenseFile>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageTags>nodiscard;roslyn;analyzer;diagnostic</PackageTags>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="$(MSBuildThisFileDirectory)\LICENSE" Pack="true" PackagePath="" />
+    <None Include="$(MSBuildThisFileDirectory)\README.md" Pack="true" PackagePath="" />
+  </ItemGroup>
+
 </Project>

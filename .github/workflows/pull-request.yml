@@ -17,7 +17,7 @@ jobs:
         run: dotnet test --configuration Release --collect:"XPlat Code Coverage"
       - name: Get Coverage xml files
         run: | 
-          $coverageFiles = (Get-ChildItem -Path '.\Tests\TestResults\*\*.xml' -File | Select-Object -ExpandProperty FullName) -join ','
+          $coverageFiles = (Get-ChildItem -Path './Tests/TestResults/*/*.xml' -File | Select-Object -ExpandProperty FullName) -join ','
           "{CoverageFiles}={$coverageFiles}" >> $env:GITHUB_ENV
         shell: pwsh
       - name: Upload coverage reports to Codecov

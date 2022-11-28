@@ -9,5 +9,4 @@
     - yes: possibly usage error?
     - no: additionalfile can still be used => BUT in that case should still work!!
         => show warning if no file AND no attribute exists?
-- build pipeline!
 - nuget package reservation?

@@ -1,0 +1,39 @@
+name: Publish NuGet
+on: 
+  workflow_dispatch:
+    inputs:
+      prerelease:
+        description: 'Create Pre-Release'
+        default: true
+        type: boolean
+        required: false
+      configuration:
+        description: 'Configuration'
+        default: Release
+        type: choice
+        required: false
+        options:
+        - Release
+        - Debug
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      DOTNET_NOLOGO: true
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup .NET Core SDK 
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: 7.0
+      - name: Pack NuGet
+        run: | 
+          $args = ()
+          if ( ${{ inputs.prerelease }} ) {
+            $args += '--version-suffix "beta.${{ github.run_number }}"'
+          }
+          dotnet pack --configuration ${{ inputs.configuration }} --output '${{ runner.temp }}/NuGets' @args
+      - name: Push NuGet
+        run: dotnet nuget push '${{ runner.temp }}/NuGets/*.nupkg' --api-key '${{ secrets.NUGET_API_KEY }}' --source https://api.nuget.org/v3/index.json
