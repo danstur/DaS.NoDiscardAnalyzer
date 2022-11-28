@@ -31,9 +31,10 @@ jobs:
       - name: Pack NuGet
         run: | 
           $args = @()
-          if ( ${{ inputs.prerelease }} ) {
+          Write-Host "Prerelease: ${{ inputs.prerelease }}"
+          if ( '${{ inputs.prerelease }}' -eq 'true' ) {
             $args += '--version-suffix "beta.${{ github.run_number }}"'
           }
           dotnet pack --configuration ${{ inputs.configuration }} --output '${{ runner.temp }}/NuGets' @args
-      - name: Push NuGet
-        run: dotnet nuget push '${{ runner.temp }}/NuGets/*.nupkg' --api-key '${{ secrets.NUGET_API_KEY }}' --source https://api.nuget.org/v3/index.json
+      # - name: Push NuGet
+      #   run: dotnet nuget push '${{ runner.temp }}/NuGets/*.nupkg' --api-key '${{ secrets.NUGET_API_KEY }}' --source https://api.nuget.org/v3/index.json
