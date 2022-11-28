@@ -36,6 +36,6 @@ jobs:
             $args += '--version-suffix'
             $args += "beta.${{ github.run_number }}"
           }
-          dotnet pack --configuration ${{ inputs.configuration }} --output '${{ runner.temp }}/NuGets' @args
+          dotnet pack --configuration ${{ inputs.configuration }} --output '${{ runner.temp }}\NuGets' @args
       - name: Push NuGet
-        run: dotnet nuget push '${{ runner.temp }}/NuGets/*.nupkg' --api-key '${{ secrets.NUGET_API_KEY }}' --source https://api.nuget.org/v3/index.json
+        run: dotnet nuget push '${{ runner.temp }}\NuGets\*.nupkg' --api-key '${{ secrets.NUGET_API_KEY }}' --source https://api.nuget.org/v3/index.json
