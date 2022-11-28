@@ -33,7 +33,8 @@ jobs:
           $args = @()
           Write-Host "Prerelease: ${{ inputs.prerelease }}"
           if ( '${{ inputs.prerelease }}' -eq 'true' ) {
-            $args += '--version-suffix "beta.${{ github.run_number }}"'
+            $args += '--version-suffix'
+            $args += "beta.${{ github.run_number }}"
           }
           dotnet pack --configuration ${{ inputs.configuration }} --output '${{ runner.temp }}/NuGets' @args
       # - name: Push NuGet
