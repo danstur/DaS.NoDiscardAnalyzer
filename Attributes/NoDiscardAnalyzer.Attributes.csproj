@@ -3,6 +3,7 @@
   <PropertyGroup>
     <TargetFramework>netstandard1.0</TargetFramework>
     <IsPackable>true</IsPackable>
+    <Description>Attribute that can be used with DaS.NoDiscardAnalyzer.</Description>
   </PropertyGroup>
 
 </Project>
