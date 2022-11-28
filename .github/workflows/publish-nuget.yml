@@ -30,7 +30,7 @@ jobs:
           dotnet-version: 7.0
       - name: Pack NuGet
         run: | 
-          $args = ()
+          $args = @()
           if ( ${{ inputs.prerelease }} ) {
             $args += '--version-suffix "beta.${{ github.run_number }}"'
           }
