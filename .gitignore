@@ -9,3 +9,5 @@ obj/
 
 # R# configuration files
 *.DotSettings.user
+
+TestResults/

@@ -36,7 +36,7 @@ internal static class CSharpVerifierHelper
     internal static void AddAttributesReference(this SolutionState state)
     {
         var attributesAssemblyPath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!,
-            "DaS.NoDiscardAnalyzer.Attributes.dll");
+                    "DaS.NoDiscardAnalyzer.Attributes.dll");
         state.AdditionalReferences.Add(attributesAssemblyPath);
     }
 }
