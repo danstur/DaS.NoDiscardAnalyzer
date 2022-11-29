@@ -5,8 +5,7 @@
 
 	  <IsPackable>true</IsPackable>
     <PackageId>DaS.NoDiscardAnalyzer</PackageId>
-    <Description>Static analzyer .</Description>
-    <PackageTags>analyzers</PackageTags>
+    <Description>Roslyn analyzer that provides similar functionality to the [[nodiscard]] attribute in C++17.</Description>
 
     <IncludeBuildOutput>false</IncludeBuildOutput>
     <SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking>
