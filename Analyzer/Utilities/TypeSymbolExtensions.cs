@@ -1,54 +1,30 @@
 ﻿using Microsoft.CodeAnalysis;
-using System;
-using System.Collections.Generic;
 using System.Linq;
 
 namespace DaS.NoDiscardAnalyzer.Utilities;
 
 internal static class TypeSymbolExtensions
 {
-    public static IEnumerable<AttributeData> GetAttributesWithInherited(this ITypeSymbol typeSymbol)
+    /// <summary>
+    /// Checks if the type or one of its base types has an attribute with the given class type.
+    /// This is an optimization that's only valid if the <paramref name="attributeClassType"/> has Inherited=true
+    /// </summary>
+    /// <param name="typeSymbol">Type and its base types for which to check if the attribute is set.</param>
+    /// <param name="attributeClassType">The attribute type that should be checked.</param>
+    /// <returns>True if the attribute exists, false otherwise.</returns>
+    public static bool HasInheritedAttributeClassType(this ITypeSymbol typeSymbol, ITypeSymbol attributeClassType)
     {
-        foreach (var attributeData in typeSymbol.GetAttributes())
+        var currentType = typeSymbol;
+        while (currentType is not null)
         {
-            yield return attributeData;
-        }
-
-        var type = typeSymbol.BaseType;
-        while (type is not null) 
-        {
-            foreach (var attributeData in type.GetAttributes().Where(IsInherited))
+            var hasAttribute = currentType.GetAttributes()
+                .Any(att => SymbolEqualityComparer.Default.Equals(att.AttributeClass, attributeClassType));
+            if (hasAttribute)
             {
-                yield return attributeData;
-            }
-            type = type.BaseType;
-        }
-    }
-
-    private static bool IsInherited(AttributeData attribute)
-    {
-        if (attribute.AttributeClass == null)
-        {
-            return false;
-        }
-
-        foreach (var attributeAttribute in attribute.AttributeClass.GetAttributes())
-        {
-            var attributeClass = attributeAttribute.AttributeClass;
-            if (attributeClass is { Name: nameof(AttributeUsageAttribute), ContainingNamespace.Name: "System" })
-            {
-                foreach (var kvp in attributeAttribute.NamedArguments)
-                {
-                    if (kvp.Key == nameof(AttributeUsageAttribute.Inherited))
-                    {
-                        return (bool)kvp.Value.Value!;
-                    }
-                }
-                // Default value of Inherited is true
                 return true;
             }
+            currentType = currentType.BaseType;
         }
         return false;
-
     }
 }

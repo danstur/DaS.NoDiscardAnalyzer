@@ -4,6 +4,7 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.IO;
@@ -48,7 +49,8 @@ public sealed class NoDiscardAnalyzer : DiagnosticAnalyzer
         var noDiscardAttributeType =
             context.Compilation.GetTypeByMetadataName(noDiscardAttributeName);
 
-        var additionalFileExists = TryGetDiscardForbiddenTypes(context.Options, context.Compilation, context.CancellationToken, out var discardForbiddenTypes);
+        var additionalFileExists = TryGetDiscardForbiddenTypes(context.Options, context.Compilation, context.CancellationToken, 
+            out var discardForbiddenTypes);
         if (noDiscardAttributeType is null && !additionalFileExists)
         {
             // TODO warning
@@ -92,11 +94,16 @@ public sealed class NoDiscardAnalyzer : DiagnosticAnalyzer
         private readonly IImmutableSet<INamedTypeSymbol> _discardForbiddenTypes;
         private readonly IImmutableSet<INamedTypeSymbol> _taskTypes;
 
+        /// <summary>
+        /// Used to cache the result of the computation for performance reasons.
+        /// </summary>
+        private readonly ConcurrentDictionary<ITypeSymbol, bool> _discardForbiddenTypesCache = new(SymbolEqualityComparer.Default);
+
         public PerCompilation(INamedTypeSymbol? noDiscardNamedTypeSymbol,
             IImmutableSet<INamedTypeSymbol> discardForbiddenTypes, IImmutableSet<INamedTypeSymbol> taskTypes)
         {
-            this._noDiscardNamedTypeSymbol = noDiscardNamedTypeSymbol;
-            this._discardForbiddenTypes = discardForbiddenTypes;
+            _noDiscardNamedTypeSymbol = noDiscardNamedTypeSymbol;
+            _discardForbiddenTypes = discardForbiddenTypes;
             _taskTypes = taskTypes;
         }
 
@@ -121,14 +128,34 @@ public sealed class NoDiscardAnalyzer : DiagnosticAnalyzer
                 return;
             }
             returnType = UnwrapTaskIfNecessary(returnType);
-            if (_discardForbiddenTypes.Contains(returnType) ||
-                HasNoDiscardAttribute(methodSymbol.GetAttributes()) ||
-                HasNoDiscardAttribute(methodSymbol.GetReturnTypeAttributes()) ||
-                HasNoDiscardAttribute(returnType.GetAttributesWithInherited()))
+            if (!_discardForbiddenTypesCache.TryGetValue(returnType, out var doNotDiscard))
+            {
+                doNotDiscard = _noDiscardNamedTypeSymbol is not null && (
+                    HasNoDiscardAttribute(methodSymbol.GetAttributes()) ||
+                    HasNoDiscardAttribute(methodSymbol.GetReturnTypeAttributes()) ||
+                    returnType.HasInheritedAttributeClassType(_noDiscardNamedTypeSymbol));
+                doNotDiscard = doNotDiscard || TypeInOrInheritsFromTypeInDiscardForbiddenTypes(returnType);
+                _discardForbiddenTypesCache[returnType] = doNotDiscard;
+            }
+            if (doNotDiscard)
             {
                 var diagnostic = Diagnostic.Create(DoNotDiscardResultRule, IsolateMethodName(invocation).GetLocation());
                 context.ReportDiagnostic(diagnostic);
             }
+        }
+
+        private bool TypeInOrInheritsFromTypeInDiscardForbiddenTypes(INamedTypeSymbol type)
+        {
+            var currentType = type;
+            while (currentType is not null)
+            {
+                if (_discardForbiddenTypes.Contains(currentType))
+                {
+                    return true;
+                }
+                currentType = currentType.BaseType;
+            }
+            return false;
         }
 
         private INamedTypeSymbol UnwrapTaskIfNecessary(INamedTypeSymbol type)
@@ -144,8 +171,8 @@ public sealed class NoDiscardAnalyzer : DiagnosticAnalyzer
             return type;
         }
 
-        private bool HasNoDiscardAttribute(IEnumerable<AttributeData> attributes) => this._noDiscardNamedTypeSymbol is not null && 
-            attributes.Any(att => SymbolEqualityComparer.Default.Equals(att.AttributeClass, this._noDiscardNamedTypeSymbol));
+        private bool HasNoDiscardAttribute(IEnumerable<AttributeData> attributes) => 
+            attributes.Any(att => SymbolEqualityComparer.Default.Equals(att.AttributeClass, _noDiscardNamedTypeSymbol));
 
         private static ExpressionSyntax IsolateMethodName(InvocationExpressionSyntax invocation)
         {

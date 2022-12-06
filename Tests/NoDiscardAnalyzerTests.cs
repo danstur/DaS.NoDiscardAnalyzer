@@ -223,6 +223,35 @@ public sealed partial class NoDiscardAnalyzerTests
     }
 
     [Fact]
+    public async Task Inherited_Type_configured_in_file_causes_diagnostic()
+    {
+        var test = """
+            namespace Baz;
+
+            public class Result {}
+
+            public class InheritedResult : Result {}
+
+            public static class Foo 
+            {
+                public static InheritedResult Bar() => new();
+
+                public static void Usage() 
+                {
+                    Foo.{|#0:Bar|}();
+                }
+            }
+            """;
+        await Verify.VerifyAnalyzerAsync(test, new VerificationOptions()
+        {
+            AdditionalForbiddenDiscardTypesFileContent = """
+            Baz.Result
+            """
+        }, Verify.Diagnostic(NoDiscardAnalyzer.DoNotDiscardResultRule)
+            .WithLocation(0));
+    }
+
+    [Fact]
     public async Task Type_configured_in_file_ignores_whitespace()
     {
         var test = """
