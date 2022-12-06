@@ -11,4 +11,9 @@ public sealed record VerificationOptions
     /// If specified an AdditionalFile with the content is provided to the analyzer
     /// </summary>
     public string? AdditionalForbiddenDiscardTypesFileContent { get; init; }
+
+    /// <summary>
+    /// If specified includes the reference to the attribute project.
+    /// </summary>
+    public bool IncludeAttributeReference { get; init; } = true;
 }

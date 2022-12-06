@@ -296,4 +296,29 @@ public sealed partial class NoDiscardAnalyzerTests
             """;
         await Verify.VerifyAnalyzerAsync(test);
     }
+
+    [Fact]
+    public async Task Neither_Attribute_Nor_AdditionalFile_defined_causes_diagnostic()
+    {
+        var test = """
+            namespace Baz;
+
+            public sealed class Result {}
+
+            public static class Foo 
+            {
+                public static Result Bar() => new();
+
+                public static void Usage() 
+                {
+                    Foo.{|#0:Bar|}();
+                }
+            }
+            """;
+        await Verify.VerifyAnalyzerAsync(test, new VerificationOptions()
+        {
+            IncludeAttributeReference = false
+        }, Verify.Diagnostic(NoDiscardAnalyzer.NeitherAttributeNorListDeclaredRule));
+    }
+
 }

@@ -20,7 +20,7 @@ public sealed class NoDiscardAnalyzer : DiagnosticAnalyzer
 
     internal const string AdditionalForbiddenDiscardTypesFileName = "TypesNotToDiscard.txt";
 
-    internal const string DiagnosticId = "DaS1000";
+    private const string DiagnosticId = "DaS1000";
 
     public static readonly DiagnosticDescriptor DoNotDiscardResultRule = new DiagnosticDescriptor(DiagnosticId, "Do not ignore return value",
         "Do not ignore return value",
@@ -29,8 +29,16 @@ public sealed class NoDiscardAnalyzer : DiagnosticAnalyzer
         true,
         "Do not discard the return value.");
 
+    public static readonly DiagnosticDescriptor NeitherAttributeNorListDeclaredRule = new DiagnosticDescriptor(DiagnosticId, 
+        $"Neither Attribute nor {AdditionalForbiddenDiscardTypesFileName} file defined",
+        "Neither Attribute nor NoDiscard file defined",
+        "Reliability",
+        DiagnosticSeverity.Warning,
+        true,
+        $"Either include the attribute or include a {AdditionalForbiddenDiscardTypesFileName} file.");
+
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = 
-        ImmutableArray.Create(DoNotDiscardResultRule);
+        ImmutableArray.Create(DoNotDiscardResultRule, NeitherAttributeNorListDeclaredRule);
 
     public override void Initialize(AnalysisContext context)
     {
@@ -53,7 +61,11 @@ public sealed class NoDiscardAnalyzer : DiagnosticAnalyzer
             out var discardForbiddenTypes);
         if (noDiscardAttributeType is null && !additionalFileExists)
         {
-            // TODO warning
+            context.RegisterCompilationEndAction(c =>
+            {
+                var diagnostic = Diagnostic.Create(NeitherAttributeNorListDeclaredRule, Location.None);
+                c.ReportDiagnostic(diagnostic);
+            });
             return;
         }
         // It'd be more accurate to check if a type is awaitable than simply hardcoding these two types, see e.g.
@@ -130,11 +142,7 @@ public sealed class NoDiscardAnalyzer : DiagnosticAnalyzer
             returnType = UnwrapTaskIfNecessary(returnType);
             if (!_discardForbiddenTypesCache.TryGetValue(returnType, out var doNotDiscard))
             {
-                doNotDiscard = _noDiscardNamedTypeSymbol is not null && (
-                    HasNoDiscardAttribute(methodSymbol.GetAttributes()) ||
-                    HasNoDiscardAttribute(methodSymbol.GetReturnTypeAttributes()) ||
-                    returnType.HasInheritedAttributeClassType(_noDiscardNamedTypeSymbol));
-                doNotDiscard = doNotDiscard || TypeInOrInheritsFromTypeInDiscardForbiddenTypes(returnType);
+                doNotDiscard = ComputeDoNotDiscardProperty(methodSymbol, returnType);
                 _discardForbiddenTypesCache[returnType] = doNotDiscard;
             }
             if (doNotDiscard)
@@ -142,6 +150,16 @@ public sealed class NoDiscardAnalyzer : DiagnosticAnalyzer
                 var diagnostic = Diagnostic.Create(DoNotDiscardResultRule, IsolateMethodName(invocation).GetLocation());
                 context.ReportDiagnostic(diagnostic);
             }
+        }
+
+        private bool ComputeDoNotDiscardProperty(IMethodSymbol methodSymbol, INamedTypeSymbol returnType)
+        {
+            var doNotDiscard = _noDiscardNamedTypeSymbol is not null && (
+                HasNoDiscardAttribute(methodSymbol.GetAttributes()) ||
+                HasNoDiscardAttribute(methodSymbol.GetReturnTypeAttributes()) ||
+                returnType.HasInheritedAttributeClassType(_noDiscardNamedTypeSymbol));
+            doNotDiscard = doNotDiscard || TypeInOrInheritsFromTypeInDiscardForbiddenTypes(returnType);
+            return doNotDiscard;
         }
 
         private bool TypeInOrInheritsFromTypeInDiscardForbiddenTypes(INamedTypeSymbol type)
