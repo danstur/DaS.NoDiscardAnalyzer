@@ -4,6 +4,7 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
 using System;
+using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
@@ -46,11 +47,13 @@ public sealed class NoDiscardAnalyzer : DiagnosticAnalyzer
         }
         var noDiscardAttributeType =
             context.Compilation.GetTypeByMetadataName(noDiscardAttributeName);
-        if (noDiscardAttributeType is null)
+
+        var additionalFileExists = TryGetDiscardForbiddenTypes(context.Options, context.Compilation, context.CancellationToken, out var discardForbiddenTypes);
+        if (noDiscardAttributeType is null && !additionalFileExists)
         {
+            // TODO warning
             return;
         }
-        var discardForbiddenTypes = GetDiscardForbiddenTypes(context.Options, context.Compilation, context.CancellationToken);
         // It'd be more accurate to check if a type is awaitable than simply hardcoding these two types, see e.g.
         // Microsoft.VisualStudio.Threading.Analyzers.DiagnosticAnalyzerState::IsAwaitableType but the performance
         // of this is significantly worse and in practice it's rare to have custom awaiters.
@@ -63,29 +66,33 @@ public sealed class NoDiscardAnalyzer : DiagnosticAnalyzer
             SyntaxKind.InvocationExpression);
     }
 
-    private static IImmutableSet<INamedTypeSymbol> GetDiscardForbiddenTypes(AnalyzerOptions analyzerOptions, Compilation compilation, CancellationToken cancellationToken)
+    private static bool TryGetDiscardForbiddenTypes(AnalyzerOptions analyzerOptions, Compilation compilation, CancellationToken cancellationToken, 
+        out IImmutableSet<INamedTypeSymbol> discardForbiddenTypes)
     {
         var additionalTypes = analyzerOptions.AdditionalFiles.FirstOrDefault(file =>
             Path.GetFileName(file.Path).Equals(AdditionalForbiddenDiscardTypesFileName, StringComparison.Ordinal));
         var text = additionalTypes?.GetText(cancellationToken);
         if (text is null)
         {
-            return ImmutableHashSet<INamedTypeSymbol>.Empty;
+            discardForbiddenTypes = ImmutableHashSet<INamedTypeSymbol>.Empty;
+            return false;
         }
-        return text.Lines.Select(line => line.ToString())
+        discardForbiddenTypes = text.Lines.Select(line => line.ToString())
             .Where(line => !string.IsNullOrWhiteSpace(line))
             .Select(line => compilation.GetTypeByMetadataName(line.Trim()))
             .FilterNull()
             .ToImmutableHashSet<INamedTypeSymbol>(SymbolEqualityComparer.Default);
+        return true;
+        
     }
 
     private sealed class PerCompilation
     {
-        private readonly INamedTypeSymbol _noDiscardNamedTypeSymbol;
+        private readonly INamedTypeSymbol? _noDiscardNamedTypeSymbol;
         private readonly IImmutableSet<INamedTypeSymbol> _discardForbiddenTypes;
         private readonly IImmutableSet<INamedTypeSymbol> _taskTypes;
 
-        public PerCompilation(INamedTypeSymbol noDiscardNamedTypeSymbol,
+        public PerCompilation(INamedTypeSymbol? noDiscardNamedTypeSymbol,
             IImmutableSet<INamedTypeSymbol> discardForbiddenTypes, IImmutableSet<INamedTypeSymbol> taskTypes)
         {
             this._noDiscardNamedTypeSymbol = noDiscardNamedTypeSymbol;
@@ -117,7 +124,7 @@ public sealed class NoDiscardAnalyzer : DiagnosticAnalyzer
             if (_discardForbiddenTypes.Contains(returnType) ||
                 HasNoDiscardAttribute(methodSymbol.GetAttributes()) ||
                 HasNoDiscardAttribute(methodSymbol.GetReturnTypeAttributes()) ||
-                HasNoDiscardAttribute(returnType.GetAttributes()))
+                HasNoDiscardAttribute(returnType.GetAttributesWithInherited()))
             {
                 var diagnostic = Diagnostic.Create(DoNotDiscardResultRule, IsolateMethodName(invocation).GetLocation());
                 context.ReportDiagnostic(diagnostic);
@@ -137,8 +144,8 @@ public sealed class NoDiscardAnalyzer : DiagnosticAnalyzer
             return type;
         }
 
-        private bool HasNoDiscardAttribute(ImmutableArray<AttributeData> attributes) => attributes.Any(att =>
-            SymbolEqualityComparer.Default.Equals(att.AttributeClass, this._noDiscardNamedTypeSymbol));
+        private bool HasNoDiscardAttribute(IEnumerable<AttributeData> attributes) => this._noDiscardNamedTypeSymbol is not null && 
+            attributes.Any(att => SymbolEqualityComparer.Default.Equals(att.AttributeClass, this._noDiscardNamedTypeSymbol));
 
         private static ExpressionSyntax IsolateMethodName(InvocationExpressionSyntax invocation)
         {
@@ -148,6 +155,7 @@ public sealed class NoDiscardAnalyzer : DiagnosticAnalyzer
                 (invocation.Expression as MemberBindingExpressionSyntax)?.Name ??
                 invocation.Expression;
         }
+
     }
 
 }

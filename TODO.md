@@ -4,9 +4,5 @@
 - good diagnostic messages!!
 - document analyzer and options on github
 - how to handle inheritance of types we should not discard?
-    - when defined in aditional file
-    - when attributing it (is it automatically inherited?)
-- should we show a warning if no attribute is available?
-    - yes: possibly usage error?
-    - no: additionalfile can still be used => BUT in that case should still work!!
-        => show warning if no file AND no attribute exists?
+    - when defined in aditional file? => also include inherited 
+- define warning when neither file nor attribute exists
