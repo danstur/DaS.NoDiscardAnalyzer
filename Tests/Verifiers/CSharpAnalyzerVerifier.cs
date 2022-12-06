@@ -41,8 +41,10 @@ public static partial class CSharpAnalyzerVerifier<TAnalyzer>
         {
             test.TestState.AdditionalFiles.Add((NoDiscardAnalyzer.AdditionalForbiddenDiscardTypesFileName, options.AdditionalForbiddenDiscardTypesFileContent));
         }
-
-        test.TestState.AddAttributesReference();
+        if (options is null || options.IncludeAttributeReference)
+        {
+            test.TestState.AddAttributesReference();
+        }
         test.ExpectedDiagnostics.AddRange(expected);
         await test.RunAsync(CancellationToken.None);
     }
