@@ -29,6 +29,10 @@ dotnet_code_quality.CA1711.allowed_suffixes = Ex
 # We don't care here since we might use keyword for the cli.
 dotnet_diagnostic.CA1716.severity = none
 
+# CA1724: Type names should not match namespaces
+# While understandable, the problems are really that severe and it makes code rather awkward.
+dotnet_diagnostic.CA1724.severity = none
+
 # CA1816: Call GC.SuppressFinalize correctly
 # Only necessary for handling unmanaged resources directly when using a finalizer. Not something we're doing.
 dotnet_diagnostic.CA1816.severity = none
