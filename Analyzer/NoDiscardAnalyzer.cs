@@ -33,7 +33,8 @@ public sealed class NoDiscardAnalyzer : DiagnosticAnalyzer
         "Reliability",
         DiagnosticSeverity.Warning,
         true,
-        $"Either include the attribute or include a {AdditionalForbiddenDiscardTypesFileName} file.");
+        $"Either include the attribute or include a {AdditionalForbiddenDiscardTypesFileName} file.",
+        customTags: WellKnownDiagnosticTags.CompilationEnd);
 
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = 
         ImmutableArray.Create(DoNotDiscardResultRule, NeitherAttributeNorListDeclaredRule);

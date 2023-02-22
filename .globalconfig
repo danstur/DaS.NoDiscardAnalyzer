@@ -6,36 +6,13 @@ is_global =  true
 # While it can be confusing, it's still useful
 dotnet_diagnostic.CA1000.severity = none
 
-# CA1031: Do not catch general exception types. While generally a good idea
-# there are situations where we do want to catch exceptions for e.g. logging purposes.
-dotnet_diagnostic.CA1031.severity = none
-
 # CA1062: Validate arguments of public methods:
-# While a good idea for library code, in application code we just rely on NNRT and the compiler.
+# We trust NNRT annotations to do the job.
 dotnet_diagnostic.CA1062.severity = none
-
-# CA1063: Implement IDisposable correctly.
-# Overkill for most use cases if no unmanaged resources and finalizers are involved
-dotnet_diagnostic.CA1063.severity = none
-
-# CA1303: Do not pass literals as localized parameters. We'll localize the necessary parts anyhow.
-dotnet_diagnostic.CA1303.severity = none
-
-# CA1711: Identifiers should not have incorrect suffix.
-# We use Ex for static classes that extend framework classes, e.g. FileEx.
-dotnet_code_quality.CA1711.allowed_suffixes = Ex
-
-# CA1711: Using a reserved keyword as the name of a namespace makes it harder for consumers in other languages to use the namespace.
-# We don't care here since we might use keyword for the cli.
-dotnet_diagnostic.CA1716.severity = none
 
 # CA1724: Type names should not match namespaces
 # While understandable, the problems are really that severe and it makes code rather awkward.
 dotnet_diagnostic.CA1724.severity = none
-
-# CA1816: Call GC.SuppressFinalize correctly
-# Only necessary for handling unmanaged resources directly when using a finalizer. Not something we're doing.
-dotnet_diagnostic.CA1816.severity = none
 
 ## IDE Warnings
 

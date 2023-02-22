@@ -16,6 +16,11 @@ on:
         - Release
         - Debug
 
+env:
+  # this variable is set in Directory.Build.props and specifies which analyser version should be used.
+  # The lower the more Visual Studio versions are supported.
+  MsCodeAnalysisVersion: 4.0.0
+
 jobs:
   build:
     runs-on: windows-latest
@@ -36,6 +41,6 @@ jobs:
             $args += '--version-suffix'
             $args += "beta.${{ github.run_number }}"
           }
-          dotnet pack --configuration ${{ inputs.configuration }} --output '${{ runner.temp }}\NuGets' @args
+          dotnet pack --configuration ${{ inputs.configuration }} --output '${{ runner.temp }}\NuGets'
       - name: Push NuGet
         run: dotnet nuget push '${{ runner.temp }}\NuGets\*.nupkg' --api-key '${{ secrets.NUGET_API_KEY }}' --source https://api.nuget.org/v3/index.json
