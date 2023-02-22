@@ -17,6 +17,7 @@ on:
         - Debug
 
 env:
+  DOTNET_NOLOGO: true
   # this variable is set in Directory.Build.props and specifies which analyser version should be used.
   # The lower the more Visual Studio versions are supported.
   MsCodeAnalysisVersion: 4.0.0
