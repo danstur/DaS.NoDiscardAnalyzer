@@ -20,22 +20,21 @@ public sealed class NoDiscardAnalyzer : DiagnosticAnalyzer
 
     internal const string AdditionalForbiddenDiscardTypesFileName = "TypesNotToDiscard.txt";
 
-    private const string DiagnosticId = "DaS1000";
-
-    public static readonly DiagnosticDescriptor DoNotDiscardResultRule = new DiagnosticDescriptor(DiagnosticId, "Do not ignore return value",
-        "Do not ignore return value",
+    public static readonly DiagnosticDescriptor DoNotDiscardResultRule = new DiagnosticDescriptor("DaS1000", "Do not ignore returned value",
+        "Do not ignore returned value",
         "Reliability",
         DiagnosticSeverity.Warning,
         true,
-        "Do not discard the return value.");
+        "Do not ignore the returned value. The type has been marked as important and should be handled by application code.");
 
-    public static readonly DiagnosticDescriptor NeitherAttributeNorListDeclaredRule = new DiagnosticDescriptor(DiagnosticId, 
-        $"Neither Attribute nor {AdditionalForbiddenDiscardTypesFileName} file defined",
-        "Neither Attribute nor NoDiscard file defined",
+    public static readonly DiagnosticDescriptor NeitherAttributeNorListDeclaredRule = new DiagnosticDescriptor("DaS1001", 
+        "NoDiscard Analyzer not active",
+        $"Neither a NoDiscardAttribute nor {AdditionalForbiddenDiscardTypesFileName} file is defined",
         "Reliability",
         DiagnosticSeverity.Warning,
         true,
-        $"Either include the attribute or include a {AdditionalForbiddenDiscardTypesFileName} file.");
+        $"Either include the attribute or include a {AdditionalForbiddenDiscardTypesFileName} file.",
+        customTags: WellKnownDiagnosticTags.CompilationEnd);
 
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = 
         ImmutableArray.Create(DoNotDiscardResultRule, NeitherAttributeNorListDeclaredRule);
@@ -97,7 +96,6 @@ public sealed class NoDiscardAnalyzer : DiagnosticAnalyzer
             .FilterNull()
             .ToImmutableHashSet<INamedTypeSymbol>(SymbolEqualityComparer.Default);
         return true;
-        
     }
 
     private sealed class PerCompilation
@@ -194,11 +192,13 @@ public sealed class NoDiscardAnalyzer : DiagnosticAnalyzer
 
         private static ExpressionSyntax IsolateMethodName(InvocationExpressionSyntax invocation)
         {
+#pragma warning disable CA1508 // Avoid dead conditional code: False positive - the code was taken from the roslyn analyzers themselves.
             return
                 (invocation.Expression as MemberAccessExpressionSyntax)?.Name ??
                 invocation.Expression as IdentifierNameSyntax ??
                 (invocation.Expression as MemberBindingExpressionSyntax)?.Name ??
                 invocation.Expression;
+#pragma warning restore CA1508 // Avoid dead conditional code
         }
 
     }
