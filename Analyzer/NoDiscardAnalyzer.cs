@@ -23,7 +23,7 @@ public sealed class NoDiscardAnalyzer : DiagnosticAnalyzer
     public static readonly DiagnosticDescriptor DoNotDiscardResultRule = new DiagnosticDescriptor("DaS1000", "Do not ignore returned value",
         "Do not ignore returned value",
         "Reliability",
-        DiagnosticSeverity.Error,
+        DiagnosticSeverity.Warning,
         true,
         "Do not ignore the returned value. The type has been marked as important and should be handled by application code.");
 
@@ -96,7 +96,6 @@ public sealed class NoDiscardAnalyzer : DiagnosticAnalyzer
             .FilterNull()
             .ToImmutableHashSet<INamedTypeSymbol>(SymbolEqualityComparer.Default);
         return true;
-        
     }
 
     private sealed class PerCompilation
